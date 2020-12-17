@@ -724,8 +724,10 @@ type CertificateRequests []*CertificateKeyRequest
 
 // CertificatePackage represents a package of certificates
 type CertificatePackage struct {
-	CertificateAuthority CertificateRequest  `yaml:"ca"`    // CA is the certificate authority request
-	Requests             CertificateRequests `yaml:"certs"` // Requests is a list of certificates to use the CA
+	CertificateAuthorityRequest *CertificateRequest `yaml:"caRequest,omitempty"` // CertificateAuthorityRequest is the certificate authority request
+	CertificateAuthority        string              `yaml:"ca,omitempty"`        // CertificateAuthority is the pem encoded certificate authority
+	CertificateAuthorityKey     string              `yaml:"caKey,omitempty"`     // CertificateAuthorityKey is the pem encoded private key of the certificate authority
+	Requests                    CertificateRequests `yaml:"requests,omitempty"`  // Requests is a list of certificates to use the CA
 }
 
 // EmbeddedFileContents represents the contents of an embedded file
