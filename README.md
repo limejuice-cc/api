@@ -1,2 +1,2 @@
-# Limejuice-cc types
-Common api type definitions
+# LimeJuice API
+API for LimeJuice provisioning

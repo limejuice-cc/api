@@ -1,4 +1,4 @@
-module github.com/limejuice-cc/types
+module github.com/limejuice-cc/api
 
 go 1.13
 
