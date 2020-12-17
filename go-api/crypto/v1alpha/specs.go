@@ -132,6 +132,7 @@ type CertificatePath struct {
 // CertificateRequest represents a certificate request
 type CertificateRequest struct {
 	Key          CertificateKeyRequest `yaml:"key"`                    // Key
+	CommonName   string                `yaml:"commonName,omitempty"`   // CommonName
 	Names        []CertificateName     `yaml:"names,omitempty"`        // Names
 	Hosts        []string              `yaml:"hosts,omitempty"`        // Hosts
 	SerialNumber string                `yaml:"serialNumber,omitempty"` // SerialNumber
