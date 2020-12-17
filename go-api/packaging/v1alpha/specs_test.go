@@ -208,39 +208,6 @@ func TestMarshalManifest(t *testing.T) {
 	assert.Error(t, yaml.Unmarshal([]byte("unknown"), &at))
 }
 
-func TestKeyAlgorithm(t *testing.T) {
-	var testValues = []struct {
-		value   string
-		outcome KeyAlgorithm
-	}{
-		{"rsa", RSAKey},
-		{"ecdsa", ECDSAKey},
-	}
-
-	for _, v := range testValues {
-		a, err := ParseKeyAlgorithm(v.value)
-		if assert.NoError(t, err) {
-			assert.Equal(t, v.outcome, a)
-			assert.Equal(t, v.value, a.String())
-		}
-	}
-
-	_, err := ParseKeyAlgorithm("")
-	assert.Error(t, err)
-	assert.Equal(t, "", keyAlgorithmNotSet.String())
-	assert.Error(t, keyAlgorithmNotSet.ValidKeySize(123))
-	assert.Error(t, RSAKey.ValidKeySize(minRSAKeySize-1))
-	assert.Error(t, RSAKey.ValidKeySize(maxRSAKeySize+1))
-	assert.Error(t, ECDSAKey.ValidKeySize(123))
-	assert.Equal(t, 0, keyAlgorithmNotSet.DefaultSize())
-	assert.NoError(t, RSAKey.ValidKeySize(RSAKey.DefaultSize()))
-	assert.NoError(t, ECDSAKey.ValidKeySize(ECDSAKey.DefaultSize()))
-
-	var ka KeyAlgorithm
-	assert.Error(t, yaml.Unmarshal([]byte("[1,2,3]"), &ka))
-	assert.Error(t, yaml.Unmarshal([]byte("unknown"), &ka))
-}
-
 func TestParseArchitecture(t *testing.T) {
 	var testValues = []struct {
 		value   string
@@ -300,15 +267,6 @@ func TestParseOperatingSystem(t *testing.T) {
 
 	_, err = yaml.Marshal([]OperatingSystem{Linux})
 	assert.NoError(t, err)
-}
-
-func TestParseCertificateKeyRequest(t *testing.T) {
-	key := CertificateKeyRequest{ECDSAKey, ECDSAKey.DefaultSize()}
-	out, err := yaml.Marshal(&key)
-	if assert.NoError(t, err) {
-		var k CertificateKeyRequest
-		assert.NoError(t, yaml.Unmarshal(out, &k))
-	}
 }
 
 func TestEmbeddedFileContents(t *testing.T) {
