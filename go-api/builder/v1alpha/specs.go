@@ -49,6 +49,7 @@ type BuildRequest interface {
 
 // BuildRequestOutput is an interface for the results of a build request
 type BuildRequestOutput interface {
+	AddFile(file BuiltFile) 
 	Files() []BuiltFile
 }
 
