@@ -25,6 +25,15 @@ const (
 	YAMLFormat
 )
 
+func (f ConfigStoreFormat) String() string {
+	switch f {
+	case YAMLFormat:
+		return "yaml"
+	default:
+		return ""
+	}
+}
+
 // ConfigStore is a generic interface for a configuration store
 type ConfigStore interface {
 	HasItem(namespace, key string) bool
