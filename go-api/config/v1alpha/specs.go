@@ -55,6 +55,7 @@ type ConfigStore interface {
 // ConfigStoreProvider is a generic interface that provides a ConfigStore
 type ConfigStoreProvider interface {
 	Initialize(options ...ConfigStoreProviderOption) error
+	ConfigStore() ConfigStore
 }
 
 // ConfigStoreProviderOption is a option for a BuildRequestProvider
