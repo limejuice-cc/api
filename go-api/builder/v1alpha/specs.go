@@ -43,28 +43,26 @@ type BuiltFile interface {
 	Type() pkg.FileType
 }
 
-// BuildRequest is a interface to request a build
+// BuildRequest is a generic interface for build requests
 type BuildRequest interface {
-	Run(options ...BuildRequestOption) ([]BuiltFile, error)
 }
 
-// BuildRequestOption is a option for a BuildRequest
-type BuildRequestOption interface {
-	Apply(BuildRequest) error
+// BuildRequestOutput is an interface for the results of a build request
+type BuildRequestOutput interface {
+	Files() []BuiltFile
 }
 
-// BuildContext is an interface that acts as glue between BuildRequest and BuildRequestContext
+// BuildContext is an interface that provides a context for builds
 type BuildContext interface {
 	Architecture() common.Architecture
 	OperatingSystem() common.OperatingSystem
-	Request() BuildRequest
 }
 
 // BuildRequestProvider is a provider that processes build requests
 type BuildRequestProvider interface {
 	plug.LimePlugin
 	Initialize(options ...BuildRequestProviderOption) error
-	Run(ctx BuildContext) ([]BuiltFile, error)
+	Execute(buildContext BuildContext, buildRequest BuildRequest) (BuildRequestOutput, error)
 }
 
 // BuildRequestProviderOption is a option for a BuildRequestProvider
