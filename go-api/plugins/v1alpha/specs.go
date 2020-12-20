@@ -66,7 +66,7 @@ func ParseLimePluginType(v string) (LimePluginType, error) {
 type LimePlugin interface {
 	Name() string
 	Description() string
-	Version() common.Version
+	Version() *common.Version
 	BuildDate() time.Time
 	Type() LimePluginType
 	Exports() map[string]interface{}
