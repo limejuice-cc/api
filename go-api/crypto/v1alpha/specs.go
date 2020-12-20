@@ -22,6 +22,8 @@ import (
 	"net"
 	"net/url"
 	"time"
+
+	plug "github.com/limejuice-cc/api/go-api/plugins/v1alpha"
 )
 
 // KeyAlgorithm specifies the type of key algorithm to use
@@ -209,6 +211,7 @@ type CertificateKeyUsages interface {
 
 // CertificateProvider is a generic interface to a provider capable of generate certificates
 type CertificateProvider interface {
+	plug.LimePlugin
 	Initialize(options ...CertificateProviderOption) error
 	ParseEncoded(certificate, privateKey []byte) (Certificate, error)
 	Generate(request *CertificateRequest) (Certificate, error)

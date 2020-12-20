@@ -55,8 +55,7 @@ func TestParseVersion(t *testing.T) {
 		assert.Equal(t, "v1.0.0-test", ver.String())
 	}
 
-	errVals := []string{"", "x2e", "1.x", "1.1.x"}
-	for _, v := range errVals {
+	for _, v := range []string{"", "x2e", "1.x", "1.1.x"} {
 		_, err := ParseVersion(v)
 		assert.Error(t, err)
 	}
