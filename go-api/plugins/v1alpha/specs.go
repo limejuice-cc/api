@@ -69,4 +69,5 @@ type LimePlugin interface {
 	Version() common.Version
 	BuildDate() time.Time
 	Type() LimePluginType
+	Exports() map[string]interface{}
 }

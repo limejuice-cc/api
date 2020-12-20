@@ -19,7 +19,6 @@ import (
 
 	common "github.com/limejuice-cc/api/go-api/common/v1alpha"
 	pkg "github.com/limejuice-cc/api/go-api/packaging/v1alpha"
-	plug "github.com/limejuice-cc/api/go-api/plugins/v1alpha"
 )
 
 // DockerBuildRequest represents a request a build request using docker
@@ -49,7 +48,7 @@ type BuildRequest interface {
 
 // BuildRequestOutput is an interface for the results of a build request
 type BuildRequestOutput interface {
-	AddFile(file BuiltFile) 
+	AddFile(file BuiltFile)
 	Files() []BuiltFile
 }
 
@@ -61,7 +60,6 @@ type BuildContext interface {
 
 // BuildRequestProvider is a provider that processes build requests
 type BuildRequestProvider interface {
-	plug.LimePlugin
 	Initialize(options ...BuildRequestProviderOption) error
 	Execute(buildContext BuildContext, buildRequest BuildRequest) (BuildRequestOutput, error)
 }
