@@ -29,6 +29,7 @@ func TestLimePluginType(t *testing.T) {
 		{in: "GenericFileGenerator", out: GenericFileGenerator, hasError: false},
 		{in: "CertificateGenerator", out: CertificateGenerator, hasError: false},
 		{in: "CommandProxy", out: CommandProxy, hasError: false},
+		{in: "ConfigStore", out: ConfigStore, hasError: false},
 		{in: "", out: limePluginNotSet, hasError: true},
 	}
 

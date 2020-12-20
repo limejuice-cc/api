@@ -33,6 +33,8 @@ const (
 	CertificateGenerator
 	// CommandProxy is a plugin that acts as a proxy for executing commands
 	CommandProxy
+	// ConfigStore is a plugin that as as a configuration storage
+	ConfigStore
 )
 
 func (t LimePluginType) String() string {
@@ -43,6 +45,8 @@ func (t LimePluginType) String() string {
 		return "CertificateGenerator"
 	case CommandProxy:
 		return "CommandProxy"
+	case ConfigStore:
+		return "ConfigStore"
 	default:
 		return ""
 	}
@@ -57,6 +61,8 @@ func ParseLimePluginType(v string) (LimePluginType, error) {
 		return CertificateGenerator, nil
 	case "commandproxy":
 		return CommandProxy, nil
+	case "configstore":
+		return ConfigStore, nil
 	default:
 		return limePluginNotSet, fmt.Errorf("unknown lime pluging type %s", v)
 	}
