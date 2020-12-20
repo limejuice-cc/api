@@ -24,11 +24,12 @@ import (
 
 // DockerBuildRequest represents a request a build request using docker
 type DockerBuildRequest struct {
-	Dockerfile string               `yaml:"dockerfile"`          // Dockerfile is the contents of the Dockerfile
-	Tags       []string             `yaml:"tags,omitempty"`      // Tags are tags to apply to the built docker image
-	BuildArgs  map[string]string    `yaml:"buildargs,omitempty"` // BuildArgs are arguments to pass while building the docker image
-	ExtraFiles common.EmbeddedFiles `yaml:"files, omitempty"`    // ExtraFiles are files to include in the docker build process
-	BuiltFiles []string             `yaml:"built"`               // BuiltFiles are files built by the docker build request
+	Dockerfile     string               `yaml:"dockerfile"`             // Dockerfile is the contents of the Dockerfile
+	DockerIgnore   string               `yaml:"dockerignore,omitempty"` // DockerIgnore is the contents of the .dockerignore file
+	Tags           []string             `yaml:"tags,omitempty"`         // Tags are tags to apply to the built docker image
+	BuildArgs      map[string]string    `yaml:"buildargs,omitempty"`    // BuildArgs are arguments to pass while building the docker image
+	ExtraFiles     common.EmbeddedFiles `yaml:"files, omitempty"`       // ExtraFiles are files to include in the docker build process
+	BuildDirectory string               `yaml:"buildDirectory"`         // BuildDirectory is the output directory where built files are generated
 }
 
 // BuiltFile represents a built file
@@ -40,7 +41,6 @@ type BuiltFile interface {
 	Size() int
 	Mode() os.FileMode
 	Type() pkg.FileType
-	String() string
 }
 
 // BuildRequest is a interface to request a build
@@ -53,10 +53,18 @@ type BuildRequestOption interface {
 	Apply(BuildRequest) error
 }
 
+// BuildContext is an interface that acts as glue between BuildRequest and BuildRequestContext
+type BuildContext interface {
+	Architecture() common.Architecture
+	OperatingSystem() common.OperatingSystem
+	Request() BuildRequest
+}
+
 // BuildRequestProvider is a provider that processes build requests
 type BuildRequestProvider interface {
 	plug.LimePlugin
 	Initialize(options ...BuildRequestProviderOption) error
+	Run(ctx BuildContext) ([]BuiltFile, error)
 }
 
 // BuildRequestProviderOption is a option for a BuildRequestProvider

@@ -21,6 +21,19 @@ import (
 	"strings"
 )
 
+// ArchitectureVariant represents a variant in the target system's architecture
+type ArchitectureVariant int
+
+const (
+	architectureVariantNotSet ArchitectureVariant = iota
+	// NoVariant indicates that there is no variant in the architecture
+	NoVariant
+)
+
+func (v ArchitectureVariant) String() string {
+	return ""
+}
+
 // Architecture represents a target system's architecture
 type Architecture int
 
@@ -67,13 +80,13 @@ func (a Architecture) MarshalYAML() (interface{}, error) {
 	return a.String(), nil
 }
 
-// Split splits an architecture into a base architecture and a variant. This is used with docker's platform definition
-func (a Architecture) Split() (string, string) {
+// Variant returns the architecture's Variant
+func (a Architecture) Variant() ArchitectureVariant {
 	switch a {
 	case AMD64:
-		return "amd64", ""
+		return NoVariant
 	default:
-		return "amd64", ""
+		return NoVariant
 	}
 }
 

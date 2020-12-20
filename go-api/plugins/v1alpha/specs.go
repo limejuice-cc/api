@@ -15,6 +15,8 @@
 package v1alpha
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
 	common "github.com/limejuice-cc/api/go-api/common/v1alpha"
@@ -32,6 +34,33 @@ const (
 	// CommandProxy is a plugin that acts as a proxy for executing commands
 	CommandProxy
 )
+
+func (t LimePluginType) String() string {
+	switch t {
+	case GenericFileGenerator:
+		return "GenericFileGenerator"
+	case CertificateGenerator:
+		return "CertificateGenerator"
+	case CommandProxy:
+		return "CommandProxy"
+	default:
+		return ""
+	}
+}
+
+// ParseLimePluginType parses a LimePluginType
+func ParseLimePluginType(v string) (LimePluginType, error) {
+	switch strings.ToLower(v) {
+	case "genericfilegenerator":
+		return GenericFileGenerator, nil
+	case "certificategenerator":
+		return CertificateGenerator, nil
+	case "commandproxy":
+		return CommandProxy, nil
+	default:
+		return limePluginNotSet, fmt.Errorf("unknown lime pluging type %s", v)
+	}
+}
 
 // LimePlugin is a generic interface for lime plugins
 type LimePlugin interface {

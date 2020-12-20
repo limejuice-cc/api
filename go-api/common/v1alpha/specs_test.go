@@ -93,12 +93,10 @@ func TestParseArchitecture(t *testing.T) {
 	_, err = yaml.Marshal(&arch)
 	assert.NoError(t, err)
 
-	main, variant := AMD64.Split()
-	assert.Equal(t, "amd64", main)
-	assert.Equal(t, "", variant)
-	main, variant = architectureNotSet.Split()
-	assert.Equal(t, "amd64", main)
-	assert.Equal(t, "", variant)
+	variant := AMD64.Variant()
+	assert.Equal(t, "", variant.String())
+	variant = architectureNotSet.Variant()
+	assert.Equal(t, "", variant.String())
 
 }
 
