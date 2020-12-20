@@ -15,194 +15,12 @@
 package v1alpha
 
 import (
-	"encoding/ascii85"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
+
+	common "github.com/limejuice-cc/api/go-api/common/v1alpha"
 )
-
-// Architecture represents a target system's architecture
-type Architecture int
-
-const (
-	architectureNotSet Architecture = iota
-	// AMD64 represents the x80_64 architecture
-	AMD64
-)
-
-func (a Architecture) String() string {
-	switch a {
-	case AMD64:
-		return "amd64"
-	default:
-		return "amd64"
-	}
-}
-
-// ParseArchitecture parses an architecture
-func ParseArchitecture(v string) (Architecture, error) {
-	switch v {
-	case "amd64":
-		return AMD64, nil
-	case "":
-		return AMD64, nil
-	default:
-		return architectureNotSet, fmt.Errorf("unknown architecture %s", v)
-	}
-}
-
-// UnmarshalYAML implements custom unmarshal for Architecture
-func (a *Architecture) UnmarshalYAML(unmarshal func(interface{}) error) (err error) {
-	var arch string
-	if err = unmarshal(&arch); err != nil {
-		return
-	}
-
-	*a, err = ParseArchitecture(arch)
-	return
-}
-
-// MarshalYAML implements custom marshalling for Architecture
-func (a Architecture) MarshalYAML() (interface{}, error) {
-	return a.String(), nil
-}
-
-// Split splits an architecture into a base architecture and a variant. This is used with docker's platform definition
-func (a Architecture) Split() (string, string) {
-	switch a {
-	case AMD64:
-		return "amd64", ""
-	default:
-		return "amd64", ""
-	}
-}
-
-// Architectures is a list of architectures
-type Architectures []Architecture
-
-// OperatingSystem specifies the operating system
-type OperatingSystem int
-
-const (
-	noOperatingSystemSet OperatingSystem = iota
-	// Linux represents the linux operating system
-	Linux
-)
-
-func (o OperatingSystem) String() string {
-	switch o {
-	case Linux:
-		return "linux"
-	default:
-		return "linux"
-	}
-}
-
-// ParseOperatingSystem parses an OperatingSystem
-func ParseOperatingSystem(v string) (OperatingSystem, error) {
-	switch v {
-	case "linux":
-		return Linux, nil
-	case "":
-		return Linux, nil
-	default:
-		return noOperatingSystemSet, fmt.Errorf("unknown operating system %s", v)
-	}
-}
-
-// UnmarshalYAML implements custom unmarshal for OperatingSystem
-func (o *OperatingSystem) UnmarshalYAML(unmarshal func(interface{}) error) (err error) {
-	var os string
-	if err = unmarshal(&os); err != nil {
-		return
-	}
-
-	*o, err = ParseOperatingSystem(os)
-	return
-}
-
-// MarshalYAML implements custom marshalling for OperatingSystem
-func (o OperatingSystem) MarshalYAML() (interface{}, error) {
-	return o.String(), nil
-}
-
-// Version represents the version of a lime package
-type Version struct {
-	Major int    // Major is the package's major version
-	Minor int    // Minor is the package's minor version
-	Patch int    // Patch is the package's patch version
-	Tag   string // Tag is the package version's tag
-}
-
-func (v *Version) String() string {
-	o := fmt.Sprintf("v%d.%d.%d", v.Major, v.Minor, v.Patch)
-	if v.Tag != "" {
-		return fmt.Sprintf("%s-%s", o, v.Tag)
-	}
-	return o
-}
-
-// ParseVersion parses a version
-func ParseVersion(v string) (*Version, error) {
-	if strings.HasPrefix(v, "v") {
-		v = v[1:]
-	}
-	if v == "" {
-		return nil, fmt.Errorf("invalid version %s", v)
-	}
-
-	parsed := &Version{}
-	parts := strings.SplitN(v, "-", 2)
-	if len(parts) > 1 {
-		parsed.Tag = parts[1]
-	}
-
-	parts = strings.Split(parts[0], ".")
-
-	major, err := strconv.ParseInt(parts[0], 10, 64)
-	if err != nil {
-		return nil, err
-	}
-	parsed.Major = int(major)
-
-	if len(parts) < 2 {
-		return parsed, nil
-	}
-	minor, err := strconv.ParseInt(parts[1], 10, 64)
-	if err != nil {
-		return nil, err
-	}
-	parsed.Minor = int(minor)
-
-	if len(parts) < 3 {
-		return parsed, nil
-	}
-
-	patch, err := strconv.ParseInt(parts[2], 10, 64)
-	if err != nil {
-		return nil, err
-	}
-	parsed.Patch = int(patch)
-
-	return parsed, nil
-}
-
-// UnmarshalYAML implements custom unmarshal for version
-func (v *Version) UnmarshalYAML(unmarshal func(interface{}) error) (err error) {
-	var version string
-	if err = unmarshal(&version); err != nil {
-		return
-	}
-
-	v, err = ParseVersion(version)
-	return
-}
-
-// MarshalYAML implements custom marshalling for version
-func (v Version) MarshalYAML() (interface{}, error) {
-	return v.String(), nil
-}
 
 // PackageName represents the name of a package
 type PackageName string
@@ -248,9 +66,9 @@ type MetadataItem struct {
 
 // Metadata represents package metadata
 type Metadata struct {
-	Description   string          `yaml:"description,omitempty"` // Description is an optional description of the package
-	Architectures Architectures   `yaml:"arch,omitempty"`        // Architectures is an optional list of architectures
-	Items         []*MetadataItem `yaml:"items,omitempty"`       // Items are additional metadata items
+	Description   string               `yaml:"description,omitempty"` // Description is an optional description of the package
+	Architectures common.Architectures `yaml:"arch,omitempty"`        // Architectures is an optional list of architectures
+	Items         []*MetadataItem      `yaml:"items,omitempty"`       // Items are additional metadata items
 }
 
 // Relationship describes the type of relationship between a  package and a dependency
@@ -409,10 +227,10 @@ func (r Required) MarshalYAML() (interface{}, error) {
 
 // Dependency is a dependant package
 type Dependency struct {
-	Name         PackageName  `yaml:"name"`         // Name is the name of the dependant package
-	Version      Version      `yaml:"version,flow"` // Version is the dependant package version
-	Requires     Required     `yaml:"requires"`     // Requires specifies the required version of the dependant package
-	Relationship Relationship `yaml:"relation"`     // Relationship is the relationship of the package to the dependant package
+	Name         PackageName    `yaml:"name"`         // Name is the name of the dependant package
+	Version      common.Version `yaml:"version,flow"` // Version is the dependant package version
+	Requires     Required       `yaml:"requires"`     // Requires specifies the required version of the dependant package
+	Relationship Relationship   `yaml:"relation"`     // Relationship is the relationship of the package to the dependant package
 }
 
 // Dependencies is a list of dependant packages
@@ -592,51 +410,44 @@ type Plugins []*Plugin
 
 // Manifest describes the contents of a lime package
 type Manifest struct {
-	Name         PackageName  `yaml:"name"`               // Name is the name of the package
-	Version      Version      `yaml:"version,flow"`       // Version is the package version
-	Created      time.Time    `yaml:"created"`            // Created is the datetime that the package was created
-	Metadata     Metadata     `yaml:"metadata,omitempty"` // Metadata is package metadata
-	Dependencies Dependencies `yaml:"depends,omitempty"`  // Dependencies are depdenant packages
-	Files        Files        `yaml:"files,omitempty"`    // Files are package files
-	Actions      Actions      `yaml:"actions,omitempty"`  // Actions are package actions
-	Triggers     Actions      `yaml:"triggers,omitempty"` // Triggers are actions triggered by other packages
-	Plugins      Plugins      `yaml:"plugins,omitempty"`  // Plugins specifies the plugsins used by this package
+	Name         PackageName    `yaml:"name"`               // Name is the name of the package
+	Version      common.Version `yaml:"version,flow"`       // Version is the package version
+	Created      time.Time      `yaml:"created"`            // Created is the datetime that the package was created
+	Metadata     Metadata       `yaml:"metadata,omitempty"` // Metadata is package metadata
+	Dependencies Dependencies   `yaml:"depends,omitempty"`  // Dependencies are depdenant packages
+	Files        Files          `yaml:"files,omitempty"`    // Files are package files
+	Actions      Actions        `yaml:"actions,omitempty"`  // Actions are package actions
+	Triggers     Actions        `yaml:"triggers,omitempty"` // Triggers are actions triggered by other packages
+	Plugins      Plugins        `yaml:"plugins,omitempty"`  // Plugins specifies the plugsins used by this package
 }
 
-// EmbeddedFileContents represents the contents of an embedded file
-type EmbeddedFileContents []byte
+const (
+	// LimePackageMagic is the magic characters for a lime package
+	LimePackageMagic string = "LiMedPkg"
+)
 
-// UnmarshalYAML implements custom unmarshal for EmbeddedFileContents
-func (c *EmbeddedFileContents) UnmarshalYAML(unmarshal func(interface{}) error) (err error) {
-	var contents string
-	if err = unmarshal(&contents); err != nil {
-		return
-	}
-
-	out := make([]byte, len(contents))
-	written, _, err := ascii85.Decode(out, []byte(contents), true)
-	if err == nil {
-		*c = out[:written]
-	}
-
-	return
+// LimePackageFileIndexEntry is an entry in the lime package file index
+type LimePackageFileIndexEntry struct {
+	Path           string `yaml:"path"`       // Path is the file path
+	Size           int64  `yaml:"size"`       // Size is the original file size
+	CompressedSize int64  `yaml:"compressed"` // CompressedSize is the compressed file size
+	FileOffset     int64  `yaml:"offset"`     // FileOffset is the offset of the file in the package
 }
 
-// MarshalYAML implements custom marshalling for EmbeddedFileContents
-func (c EmbeddedFileContents) MarshalYAML() (interface{}, error) {
-	out := make([]byte, ascii85.MaxEncodedLen(len(c)))
-	written := ascii85.Encode(out, []byte(c))
-	return string(out[:written]), nil
+// LimePackageFileIndex is the file index for a lime package
+type LimePackageFileIndex struct {
+	Files []LimePackageFileIndexEntry `yaml:"files"` // Files are the entries in the file index
 }
 
-// EmbeddedFiles is a lit of embedded files
-type EmbeddedFiles map[string]EmbeddedFileContents
+// RawLimePackageFile is a raw lime package file
+type RawLimePackageFile []byte
 
-// DockerBuildRequest represents a request a build request using docker
-type DockerBuildRequest struct {
-	Dockerfile     string            `yaml:"dockerfile"`          // Dockerfile is the contents of the Dockerfile
-	Tags           []string          `yaml:"tags,omitempty"`      // Tags are tags to apply to the built docker image
-	BuildArgs      map[string]string `yaml:"buildargs,omitempty"` // BuildArgs are arguments to pass while building the docker image
-	ExtraFiles     EmbeddedFiles     `yaml:"files, omitempty"`    // ExtraFiles are files to include in the docker build process
-	BuildDirectory string            `yaml:"buildDirectory"`      // BuildDirectory is the directory within the docker image to extract built files
+// RawLimePackage is a raw lime package
+type RawLimePackage struct {
+	Magic          [8]byte
+	ManifestLength [8]byte
+	Manifest       []byte
+	IndexLength    [8]byte
+	Index          []byte
+	Files          []byte
 }

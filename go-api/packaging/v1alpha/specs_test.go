@@ -15,51 +15,14 @@
 package v1alpha
 
 import (
-	"math/rand"
 	"testing"
 	"time"
+
+	common "github.com/limejuice-cc/api/go-api/common/v1alpha"
 
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v3"
 )
-
-func TestParseVersion(t *testing.T) {
-	var testValues = []struct {
-		value   string
-		outcome Version
-	}{
-		{"v1.2.0", Version{1, 2, 0, ""}},
-		{"v1.2", Version{1, 2, 0, ""}},
-		{"v1", Version{1, 0, 0, ""}},
-		{"1.2.0", Version{1, 2, 0, ""}},
-		{"v1.2.0-test", Version{1, 2, 0, "test"}},
-	}
-
-	for _, v := range testValues {
-		ver, err := ParseVersion(v.value)
-		if assert.NoError(t, err) {
-			assert.Equal(t, v.outcome.Major, ver.Major)
-			assert.Equal(t, v.outcome.Minor, ver.Minor)
-			assert.Equal(t, v.outcome.Patch, ver.Patch)
-			assert.Equal(t, v.outcome.Tag, ver.Tag)
-		}
-	}
-
-	ver, err := ParseVersion("1")
-	if assert.NoError(t, err) {
-		assert.Equal(t, "v1.0.0", ver.String())
-	}
-
-	ver, err = ParseVersion("1.0.0-test")
-	if assert.NoError(t, err) {
-		assert.Equal(t, "v1.0.0-test", ver.String())
-	}
-
-	for _, v := range []string{"", "x2e", "1.x", "1.1.x"} {
-		_, err := ParseVersion(v)
-		assert.Error(t, err)
-	}
-}
 
 func TestParseRelationship(t *testing.T) {
 	var testValues = []struct {
@@ -169,8 +132,8 @@ func TestMarshalManifest(t *testing.T) {
 	manifest.Name = "test"
 	manifest.Version.Major = 1
 	manifest.Created = time.Now()
-	manifest.Metadata.Architectures = Architectures{AMD64}
-	manifest.Dependencies = Dependencies{&Dependency{"test", Version{1, 0, 0, ""}, RequiresEqual, Depends}}
+	manifest.Metadata.Architectures = common.Architectures{common.AMD64}
+	manifest.Dependencies = Dependencies{&Dependency{"test", common.Version{Major: 1, Minor: 0, Patch: 0, Tag: ""}, RequiresEqual, Depends}}
 	manifest.Files = Files{&File{Path: "test file"}}
 	manifest.Actions = Actions{&Action{Type: Install}}
 	out, err := yaml.Marshal(&manifest)
@@ -205,84 +168,4 @@ func TestMarshalManifest(t *testing.T) {
 	var at ActionType
 	assert.Error(t, yaml.Unmarshal([]byte("[1,2,3]"), &at))
 	assert.Error(t, yaml.Unmarshal([]byte("unknown"), &at))
-}
-
-func TestParseArchitecture(t *testing.T) {
-	var testValues = []struct {
-		value   string
-		outcome Architecture
-	}{
-		{"amd64", AMD64},
-	}
-
-	for _, v := range testValues {
-		a, err := ParseArchitecture(v.value)
-		if assert.NoError(t, err) {
-			assert.Equal(t, v.outcome, a)
-			assert.Equal(t, v.value, a.String())
-		}
-	}
-
-	_, err := ParseArchitecture("")
-	assert.NoError(t, err)
-	assert.Equal(t, "amd64", architectureNotSet.String())
-
-	var arch Architecture
-	assert.Error(t, yaml.Unmarshal([]byte("[1,2,3]"), &arch))
-	assert.Error(t, yaml.Unmarshal([]byte("unknown"), &arch))
-
-	main, variant := AMD64.Split()
-	assert.Equal(t, "amd64", main)
-	assert.Equal(t, "", variant)
-	main, variant = architectureNotSet.Split()
-	assert.Equal(t, "amd64", main)
-	assert.Equal(t, "", variant)
-
-}
-
-func TestParseOperatingSystem(t *testing.T) {
-	var testValues = []struct {
-		value   string
-		outcome OperatingSystem
-	}{
-		{"linux", Linux},
-	}
-
-	for _, v := range testValues {
-		a, err := ParseOperatingSystem(v.value)
-		if assert.NoError(t, err) {
-			assert.Equal(t, v.outcome, a)
-			assert.Equal(t, v.value, a.String())
-		}
-	}
-
-	_, err := ParseOperatingSystem("")
-	assert.NoError(t, err)
-	assert.Equal(t, "linux", noOperatingSystemSet.String())
-
-	var os OperatingSystem
-	assert.Error(t, yaml.Unmarshal([]byte("[1,2,3]"), &os))
-	assert.Error(t, yaml.Unmarshal([]byte("unknown"), &os))
-
-	_, err = yaml.Marshal([]OperatingSystem{Linux})
-	assert.NoError(t, err)
-}
-
-func TestEmbeddedFileContents(t *testing.T) {
-	raw := make([]byte, 256)
-	_, err := rand.Read(raw)
-	if assert.NoError(t, err) {
-		f := EmbeddedFiles{}
-		f["test"] = raw
-		out, err := yaml.Marshal(&f)
-		if assert.NoError(t, err) {
-			var v EmbeddedFiles
-			assert.NoError(t, yaml.Unmarshal(out, &v))
-		}
-	}
-
-	var c EmbeddedFileContents
-	assert.Error(t, yaml.Unmarshal([]byte("[1,2,3]"), &c))
-	assert.Error(t, yaml.Unmarshal([]byte("!!!!!>>>>"), &c))
-
 }

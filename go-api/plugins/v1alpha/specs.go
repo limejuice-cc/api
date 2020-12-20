@@ -17,7 +17,7 @@ package v1alpha
 import (
 	"time"
 
-	pkg "github.com/limejuice-cc/api/go-api/packaging/v1alpha"
+	common "github.com/limejuice-cc/api/go-api/common/v1alpha"
 )
 
 // LimePluginType is the type of lime plugin
@@ -37,7 +37,7 @@ const (
 type LimePlugin interface {
 	Name() string
 	Description() string
-	Version() pkg.Version
+	Version() common.Version
 	BuildDate() time.Time
 	Type() LimePluginType
 }
