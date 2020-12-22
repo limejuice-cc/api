@@ -38,7 +38,7 @@ type File interface {
 	Path() string
 	Type() FileType
 	Size() int64
-	FileMode() os.FileMode
+	Mode() os.FileMode
 	Owner() Owner
 	ATime() time.Time
 	MTime() time.Time
