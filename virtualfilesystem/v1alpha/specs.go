@@ -34,7 +34,7 @@ type Owner interface {
 // File is a generic interface representing a virtual file
 type File interface {
 	Name() string
-	BasePath() string
+	Dir() string
 	Path() string
 	Type() FileType
 	Size() int64
