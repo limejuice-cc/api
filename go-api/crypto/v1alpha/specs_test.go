@@ -40,12 +40,12 @@ func TestKeyAlgorithm(t *testing.T) {
 
 	_, err := ParseKeyAlgorithm("")
 	assert.Error(t, err)
-	assert.Equal(t, "", keyAlgorithmNotSet.String())
-	assert.Error(t, keyAlgorithmNotSet.ValidKeySize(123))
+	assert.Equal(t, "", KeyAlgorithm(0).String())
+	assert.Error(t, KeyAlgorithm(0).ValidKeySize(123))
 	assert.Error(t, RSAKey.ValidKeySize(minRSAKeySize-1))
 	assert.Error(t, RSAKey.ValidKeySize(maxRSAKeySize+1))
 	assert.Error(t, ECDSAKey.ValidKeySize(123))
-	assert.Equal(t, 0, keyAlgorithmNotSet.DefaultSize())
+	assert.Equal(t, 0, KeyAlgorithm(0).DefaultSize())
 	assert.NoError(t, RSAKey.ValidKeySize(RSAKey.DefaultSize()))
 	assert.NoError(t, ECDSAKey.ValidKeySize(ECDSAKey.DefaultSize()))
 

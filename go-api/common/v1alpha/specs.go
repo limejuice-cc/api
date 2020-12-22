@@ -21,123 +21,8 @@ import (
 	"strings"
 )
 
-// ArchitectureVariant represents a variant in the target system's architecture
-type ArchitectureVariant int
-
-const (
-	architectureVariantNotSet ArchitectureVariant = iota
-	// NoVariant indicates that there is no variant in the architecture
-	NoVariant
-)
-
-func (v ArchitectureVariant) String() string {
-	return ""
-}
-
-// Architecture represents a target system's architecture
-type Architecture int
-
-const (
-	architectureNotSet Architecture = iota
-	// AMD64 represents the x80_64 architecture
-	AMD64
-)
-
-func (a Architecture) String() string {
-	switch a {
-	case AMD64:
-		return "amd64"
-	default:
-		return "amd64"
-	}
-}
-
-// ParseArchitecture parses an architecture
-func ParseArchitecture(v string) (Architecture, error) {
-	switch v {
-	case "amd64":
-		return AMD64, nil
-	case "":
-		return AMD64, nil
-	default:
-		return architectureNotSet, fmt.Errorf("unknown architecture %s", v)
-	}
-}
-
-// UnmarshalYAML implements custom unmarshal for Architecture
-func (a *Architecture) UnmarshalYAML(unmarshal func(interface{}) error) (err error) {
-	var arch string
-	if err = unmarshal(&arch); err != nil {
-		return
-	}
-
-	*a, err = ParseArchitecture(arch)
-	return
-}
-
-// MarshalYAML implements custom marshalling for Architecture
-func (a Architecture) MarshalYAML() (interface{}, error) {
-	return a.String(), nil
-}
-
-// Variant returns the architecture's Variant
-func (a Architecture) Variant() ArchitectureVariant {
-	switch a {
-	case AMD64:
-		return NoVariant
-	default:
-		return NoVariant
-	}
-}
-
 // Architectures is a list of architectures
 type Architectures []Architecture
-
-// OperatingSystem specifies the operating system
-type OperatingSystem int
-
-const (
-	noOperatingSystemSet OperatingSystem = iota
-	// Linux represents the linux operating system
-	Linux
-)
-
-func (o OperatingSystem) String() string {
-	switch o {
-	case Linux:
-		return "linux"
-	default:
-		return "linux"
-	}
-}
-
-// ParseOperatingSystem parses an OperatingSystem
-func ParseOperatingSystem(v string) (OperatingSystem, error) {
-	switch v {
-	case "linux":
-		return Linux, nil
-	case "":
-		return Linux, nil
-	default:
-		return noOperatingSystemSet, fmt.Errorf("unknown operating system %s", v)
-	}
-}
-
-// UnmarshalYAML implements custom unmarshal for OperatingSystem
-func (o *OperatingSystem) UnmarshalYAML(unmarshal func(interface{}) error) (err error) {
-	var os string
-	if err = unmarshal(&os); err != nil {
-		return
-	}
-
-	*o, err = ParseOperatingSystem(os)
-	return
-}
-
-// MarshalYAML implements custom marshalling for OperatingSystem
-func (o OperatingSystem) MarshalYAML() (interface{}, error) {
-	return o.String(), nil
-}
 
 // Version represents the version of a lime package
 type Version struct {
@@ -200,46 +85,40 @@ func ParseVersion(v string) (*Version, error) {
 	return parsed, nil
 }
 
-// UnmarshalYAML implements custom unmarshal for version
-func (v *Version) UnmarshalYAML(unmarshal func(interface{}) error) (err error) {
-	var version string
-	if err = unmarshal(&version); err != nil {
-		return
-	}
-
-	v, err = ParseVersion(version)
-	return
+// MarshalText implements the text marshaller method
+func (v *Version) MarshalText() ([]byte, error) {
+	return []byte(v.String()), nil
 }
 
-// MarshalYAML implements custom marshalling for version
-func (v Version) MarshalYAML() (interface{}, error) {
-	return v.String(), nil
+// UnmarshalText implements the text unmarshaller method
+func (v *Version) UnmarshalText(text []byte) error {
+	value := string(text)
+	tmp, err := ParseVersion(value)
+	if err != nil {
+		return err
+	}
+	v = tmp
+	return nil
 }
 
 // EmbeddedFileContents represents the contents of an embedded file
 type EmbeddedFileContents []byte
 
-// UnmarshalYAML implements custom unmarshal for EmbeddedFileContents
-func (c *EmbeddedFileContents) UnmarshalYAML(unmarshal func(interface{}) error) (err error) {
-	var contents string
-	if err = unmarshal(&contents); err != nil {
-		return
-	}
-
-	out := make([]byte, len(contents))
-	written, _, err := ascii85.Decode(out, []byte(contents), true)
+// UnmarshalText implements the text unmarshaller method
+func (c *EmbeddedFileContents) UnmarshalText(text []byte) (err error) {
+	out := make([]byte, len(text))
+	written, _, err := ascii85.Decode(out, text, true)
 	if err == nil {
 		*c = out[:written]
 	}
-
 	return
 }
 
-// MarshalYAML implements custom marshalling for EmbeddedFileContents
-func (c EmbeddedFileContents) MarshalYAML() (interface{}, error) {
+// MarshalText implements the text marshaller method
+func (c EmbeddedFileContents) MarshalText() ([]byte, error) {
 	out := make([]byte, ascii85.MaxEncodedLen(len(c)))
 	written := ascii85.Encode(out, []byte(c))
-	return string(out[:written]), nil
+	return out[:written], nil
 }
 
 // EmbeddedFiles is a lit of embedded files

@@ -49,7 +49,7 @@ func TestParseRelationship(t *testing.T) {
 
 	_, err := ParseRelationship("")
 	assert.Error(t, err)
-	assert.Equal(t, "", noRelationshipSet.String())
+	assert.Equal(t, "", Relationship(0).String())
 }
 
 func TestParseRequired(t *testing.T) {
@@ -74,7 +74,7 @@ func TestParseRequired(t *testing.T) {
 
 	_, err := ParseRequired("")
 	assert.Error(t, err)
-	assert.Equal(t, "", requiredNotSet.String())
+	assert.Equal(t, "", Required(0).String())
 }
 
 func TestParseFileType(t *testing.T) {
@@ -124,7 +124,7 @@ func TestParseActionType(t *testing.T) {
 
 	_, err := ParseActionType("")
 	assert.Error(t, err)
-	assert.Equal(t, "", noActionTypeSet.String())
+	assert.Equal(t, "", ActionType(0).String())
 }
 
 func TestMarshalManifest(t *testing.T) {

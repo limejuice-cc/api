@@ -14,25 +14,9 @@
 
 package v1alpha
 
-import "io"
-
-// ConfigStoreFormat specifies a configuration store format
-type ConfigStoreFormat int
-
-const (
-	configStoreFormatNotSet ConfigStoreFormat = iota
-	// YAMLFormat indicates a yaml configuration file
-	YAMLFormat
+import (
+	"io"
 )
-
-func (f ConfigStoreFormat) String() string {
-	switch f {
-	case YAMLFormat:
-		return "yaml"
-	default:
-		return ""
-	}
-}
 
 // ConfigStore is a generic interface for a configuration store
 type ConfigStore interface {

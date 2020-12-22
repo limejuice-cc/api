@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/yaml.v3"
 )
 
 func TestLimePluginType(t *testing.T) {
@@ -26,11 +27,12 @@ func TestLimePluginType(t *testing.T) {
 		out      LimePluginType
 		hasError bool
 	}{
-		{in: "GenericFileGenerator", out: GenericFileGenerator, hasError: false},
+		{in: "Builder", out: Builder, hasError: false},
 		{in: "CertificateGenerator", out: CertificateGenerator, hasError: false},
 		{in: "CommandProxy", out: CommandProxy, hasError: false},
 		{in: "ConfigStore", out: ConfigStore, hasError: false},
-		{in: "", out: limePluginNotSet, hasError: true},
+		{in: "GenericFileGenerator", out: GenericFileGenerator, hasError: false},
+		{in: "", out: LimePluginType(0), hasError: true},
 	}
 
 	for _, tst := range testValues {
@@ -42,4 +44,11 @@ func TestLimePluginType(t *testing.T) {
 		}
 		assert.Equal(t, tst.out, v)
 	}
+
+	var lpt LimePluginType
+	assert.Error(t, yaml.Unmarshal([]byte("[1,2,3]"), &lpt))
+	assert.Error(t, yaml.Unmarshal([]byte("unknown"), &lpt))
+	assert.NoError(t, yaml.Unmarshal([]byte("Builder"), &lpt))
+	_, err := yaml.Marshal(&lpt)
+	assert.NoError(t, err)
 }

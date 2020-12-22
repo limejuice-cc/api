@@ -12,20 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package v1alpha
+package limejuiceerrors
 
-import (
-	"time"
+// LimeJuiceError is the limejuice base error
+type LimeJuiceError struct {
+	Message string
+}
 
-	common "github.com/limejuice-cc/api/go-api/common/v1alpha"
-)
-
-// LimePlugin is a generic interface for lime plugins
-type LimePlugin interface {
-	Name() string
-	Description() string
-	Version() *common.Version
-	BuildDate() time.Time
-	Type() LimePluginType
-	Exports() map[string]interface{}
+func (e *LimeJuiceError) Error() string {
+	return e.Message
 }

@@ -17,95 +17,11 @@ package v1alpha
 import (
 	"crypto"
 	"crypto/x509"
-	"fmt"
 	"math/big"
 	"net"
 	"net/url"
 	"time"
 )
-
-// KeyAlgorithm specifies the type of key algorithm to use
-type KeyAlgorithm int
-
-const (
-	keyAlgorithmNotSet KeyAlgorithm = iota
-	// ECDSAKey specifies the ecdsa algorithm
-	ECDSAKey
-	// RSAKey specifies an RSA key
-	RSAKey
-)
-
-// ParseKeyAlgorithm parses a key algorithm
-func ParseKeyAlgorithm(in string) (KeyAlgorithm, error) {
-	switch in {
-	case "ecdsa":
-		return ECDSAKey, nil
-	case "rsa":
-		return RSAKey, nil
-	default:
-		return keyAlgorithmNotSet, fmt.Errorf("unknown key type: %s", in)
-	}
-}
-
-func (a KeyAlgorithm) String() string {
-	switch a {
-	case ECDSAKey:
-		return "ecdsa"
-	case RSAKey:
-		return "rsa"
-	}
-	return ""
-}
-
-// DefaultSize returns the default key size for the specified algorithm
-func (a KeyAlgorithm) DefaultSize() int {
-	switch a {
-	case ECDSAKey:
-		return 256
-	case RSAKey:
-		return 4096
-	}
-	return 0
-}
-
-const (
-	minRSAKeySize = 2048
-	maxRSAKeySize = 8192
-)
-
-// ValidKeySize checks if the supplied key size is valid for the KeyAlgorithm
-func (a KeyAlgorithm) ValidKeySize(size int) error {
-	switch a {
-	case ECDSAKey:
-		if !(size == 0 || size == 256 || size == 384 || size == 521) {
-			return fmt.Errorf("invalid ecdsa key size %d - key size must be either 256, 384 or 521", size)
-		}
-		return nil
-	case RSAKey:
-		if !(size == 0 || (size >= minRSAKeySize && size <= maxRSAKeySize)) {
-			return fmt.Errorf("invalid rsa key size %d - key size must be between %d and %d", size, minRSAKeySize, maxRSAKeySize)
-		}
-		return nil
-	}
-
-	return fmt.Errorf("invalid key algorithm")
-}
-
-// UnmarshalYAML implements custom unmarshal for KeyAlgorithm
-func (a *KeyAlgorithm) UnmarshalYAML(unmarshal func(interface{}) error) (err error) {
-	var actionType string
-	if err = unmarshal(&actionType); err != nil {
-		return
-	}
-
-	*a, err = ParseKeyAlgorithm(actionType)
-	return
-}
-
-// MarshalYAML implements custom marshalling for KeyAlgorithm
-func (a KeyAlgorithm) MarshalYAML() (interface{}, error) {
-	return a.String(), nil
-}
 
 // CertificateName contains subject fields
 type CertificateName struct {

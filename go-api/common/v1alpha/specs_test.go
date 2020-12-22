@@ -61,6 +61,7 @@ func TestParseVersion(t *testing.T) {
 
 	assert.Error(t, yaml.Unmarshal([]byte("[1,2,3]"), &ver))
 	assert.Error(t, yaml.Unmarshal([]byte("NONEn"), &ver))
+	assert.NoError(t, yaml.Unmarshal([]byte("v1.0.0-test"), &ver))
 
 	_, err = yaml.Marshal(&ver)
 	assert.NoError(t, err)
@@ -84,20 +85,49 @@ func TestParseArchitecture(t *testing.T) {
 
 	_, err := ParseArchitecture("")
 	assert.NoError(t, err)
-	assert.Equal(t, "amd64", architectureNotSet.String())
+	assert.Equal(t, "amd64", Architecture(0).String())
 
 	var arch Architecture
 	assert.Error(t, yaml.Unmarshal([]byte("[1,2,3]"), &arch))
 	assert.Error(t, yaml.Unmarshal([]byte("unknown"), &arch))
+	assert.NoError(t, yaml.Unmarshal([]byte("amd64"), &arch))
 
 	_, err = yaml.Marshal(&arch)
 	assert.NoError(t, err)
 
 	variant := AMD64.Variant()
-	assert.Equal(t, "", variant.String())
-	variant = architectureNotSet.Variant()
-	assert.Equal(t, "", variant.String())
+	assert.Equal(t, "none", variant.String())
+	variant = Architecture(0).Variant()
+	assert.Equal(t, "none", variant.String())
+}
 
+func TestParseArchitectureVariant(t *testing.T) {
+	var testValues = []struct {
+		value   string
+		outcome ArchitectureVariant
+	}{
+		{"none", NoVariant},
+	}
+
+	for _, v := range testValues {
+		a, err := ParseArchitectureVariant(v.value)
+		if assert.NoError(t, err) {
+			assert.Equal(t, v.outcome, a)
+			assert.Equal(t, v.value, a.String())
+		}
+	}
+
+	_, err := ParseArchitectureVariant("")
+	assert.NoError(t, err)
+	assert.Equal(t, "none", ArchitectureVariant(0).String())
+
+	var av ArchitectureVariant
+	assert.Error(t, yaml.Unmarshal([]byte("[1,2,3]"), &av))
+	assert.Error(t, yaml.Unmarshal([]byte("unknown"), &av))
+	assert.NoError(t, yaml.Unmarshal([]byte("none"), &av))
+
+	_, err = yaml.Marshal(&av)
+	assert.NoError(t, err)
 }
 
 func TestParseOperatingSystem(t *testing.T) {
@@ -118,14 +148,16 @@ func TestParseOperatingSystem(t *testing.T) {
 
 	_, err := ParseOperatingSystem("")
 	assert.NoError(t, err)
-	assert.Equal(t, "linux", noOperatingSystemSet.String())
+	assert.Equal(t, "linux", OperatingSystem(0).String())
 
 	var os OperatingSystem
 	assert.Error(t, yaml.Unmarshal([]byte("[1,2,3]"), &os))
 	assert.Error(t, yaml.Unmarshal([]byte("unknown"), &os))
+	assert.NoError(t, yaml.Unmarshal(([]byte("linux")), &os))
 
 	_, err = yaml.Marshal([]OperatingSystem{Linux})
 	assert.NoError(t, err)
+
 }
 
 func TestEmbeddedFileContents(t *testing.T) {
@@ -142,6 +174,6 @@ func TestEmbeddedFileContents(t *testing.T) {
 	}
 
 	var c EmbeddedFileContents
-	assert.Error(t, yaml.Unmarshal([]byte("[1,2,3]"), &c))
+	assert.Error(t, yaml.Unmarshal([]byte("[1,2,3"), &c))
 	assert.Error(t, yaml.Unmarshal([]byte("!!!!!>>>>"), &c))
 }
