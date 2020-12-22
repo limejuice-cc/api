@@ -18,7 +18,7 @@ import (
 	"testing"
 	"time"
 
-	common "github.com/limejuice-cc/api/go-api/common/v1alpha"
+	common "github.com/limejuice-cc/api/common/v1alpha"
 
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v3"

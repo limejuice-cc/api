@@ -17,8 +17,8 @@ package v1alpha
 import (
 	"os"
 
-	common "github.com/limejuice-cc/api/go-api/common/v1alpha"
-	pkg "github.com/limejuice-cc/api/go-api/packaging/v1alpha"
+	common "github.com/limejuice-cc/api/common/v1alpha"
+	pkg "github.com/limejuice-cc/api/packaging/v1alpha"
 )
 
 // DockerBuildRequest represents a request a build request using docker

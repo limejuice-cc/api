@@ -19,7 +19,7 @@ import (
 	"strings"
 	"time"
 
-	common "github.com/limejuice-cc/api/go-api/common/v1alpha"
+	common "github.com/limejuice-cc/api/common/v1alpha"
 )
 
 // PackageName represents the name of a package

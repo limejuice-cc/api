@@ -17,7 +17,7 @@ package v1alpha
 import (
 	"time"
 
-	common "github.com/limejuice-cc/api/go-api/common/v1alpha"
+	common "github.com/limejuice-cc/api/common/v1alpha"
 )
 
 // LimePlugin is a generic interface for lime plugins
