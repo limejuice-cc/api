@@ -20,13 +20,16 @@ import (
 	"time"
 )
 
-// Owner is a virtual owner of a file
-type Owner interface {
-	User() string
+// User is a virtual owner (user) of a file
+type User interface {
+	UName() string
 	UID() int
 	RealUID() int
+}
 
-	Group() string
+// Group is a virtual owner (group) of a file
+type Group interface {
+	GName() string
 	GID() int
 	RealGID() int
 }
@@ -39,7 +42,8 @@ type File interface {
 	Type() FileType
 	Size() int64
 	Mode() os.FileMode
-	Owner() Owner
+	User() User
+	Group() Group
 	ATime() time.Time
 	MTime() time.Time
 	FileInfo() os.FileInfo
@@ -59,17 +63,12 @@ type WritableFile interface {
 	io.Writer
 }
 
-// Directory is a generic interface representing a virtual directory
-type Directory interface {
-	File
-	Files() []File
-}
-
 // VirtualFileSystemProvider is a generic interface to a provider hosting a virtual filesystem
 type VirtualFileSystemProvider interface {
 	Initialize(options ...VirtualFileSystemProviderOption) error
 
-	AddOwner(owner Owner) error
+	AddUser(user User) error
+	AddGroup(group Group) error
 
 	Open(name string) (ReadableFile, error)
 	Create(name string) (WritableFile, error)
